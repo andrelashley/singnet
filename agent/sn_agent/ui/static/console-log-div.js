@@ -31,14 +31,13 @@
     var style = outer.style;
     // style.width = '100%';
     // style.minHeight = '200px';
-    style.fontFamily = 'monospace';
+    style.fontFamily = 'Open Sans';
     style.marginTop = '20px';
     style.marginLeft = '10px';
     style.marginRight = '10px';
     style.whiteSpace = 'pre';
-    style.border = '1px solid black';
-    style.borderRadius = '5px';
     style.padding = '5px 10px';
+    style.backgroundColor = '#727272';
     return outer;
   }
 
@@ -48,11 +47,17 @@
 
     var caption = document.createTextNode('console output');
     var legend = document.createElement('legend');
+    var style = legend.style;
+    style.paddingTop = "1.5em";
+    style.color = "#FFFFFF";
     legend.appendChild(caption);
     outer.appendChild(legend);
 
     var div = document.createElement('div');
     div.id = 'console-log-text';
+    div.style.color = '#104e8b';
+    div.style.fontWeight = "bold";
+    div.style.fontSize = "16px";
     outer.appendChild(div);
 
     return div;
