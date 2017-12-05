@@ -99,7 +99,7 @@
     var len = objArr.length;
     var $table = document.createElement('table');
     $table.style.width = '100%';
-    $table.setAttribute('border', '1');
+    // $table.setAttribute('border', '1');
     var $head = document.createElement('thead');
     var $tdata = document.createElement('td');
     $tdata.innerHTML = 'Index';
