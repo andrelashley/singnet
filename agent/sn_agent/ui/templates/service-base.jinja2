@@ -24,10 +24,6 @@
                         "id": seq
                     };
 
-                    if (!!job_params) {
-                        request['params']['job_params'] = job_params
-                    }
-
                     this.$http.post('/api', JSON.stringify(request)).then(successCallback, errorCallback);;
                 }
             }

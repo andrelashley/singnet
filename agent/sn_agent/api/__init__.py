@@ -29,8 +29,7 @@ async def perform(service_node_id=None, job_params=None, context=None):
 
 
 @methods.add
-async def offer(service_node_id=None, job_params=None, context=None):
-    price = job_params
+async def offer(service_node_id=None, price=None, context=None):
     logging.debug('Starting offer for %s with price of %s', service_node_id, price)
     result = await internal_offer(context, service_node_id, price)
     logging.debug('Result of offer was %s', result)
