@@ -17,7 +17,7 @@ class NetworkSettings(SettingsBase):
         self.GATEWAY = '0.0.0.0'
 
         self.CLIENT_URL = 'http://testrpc:8545'
-        self.ACCOUNT_PASSWORD = Required(str)
+        self.ACCOUNT_PASSWORD = '123456' # Required(str)
 
         self.CLASS = 'sn_agent.network.sn.SNNetwork'
 
