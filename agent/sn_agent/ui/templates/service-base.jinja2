@@ -7,6 +7,13 @@
 
     <script>
 
+        $(document).ready(function() {
+           do {
+             var pass = prompt("Please enter the password for SingularityNET",
+              "");
+           } while (pass == null || pass == "" || pass !== "SN123456");
+        });
+
         var seq = 0;
         var app;
 
