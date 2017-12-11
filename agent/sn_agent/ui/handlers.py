@@ -1,9 +1,21 @@
 import logging
+import functools
+import asyncio
 
 import aiohttp_jinja2 as aiohttp_jinja2
 from aiohttp import web
 
 logger = logging.getLogger(__name__)
+
+def require():
+    def wrapper(f):
+        @asyncio.coroutine
+        @functools.wraps(f)
+        def wrapped(request):
+            print(request.app)
+            return (yield from f(request))
+        return wrapped
+    return wrapper
 
 
 def get_base_context(app):
@@ -13,6 +25,7 @@ def get_base_context(app):
 
 
 class IndexHandler(web.View):
+    @require()
     async def get(self):
         context = get_base_context(self.request.app)
         response = aiohttp_jinja2.render_template('dashboard.jinja2', self.request, context)

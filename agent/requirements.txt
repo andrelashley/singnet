@@ -33,3 +33,4 @@ fire
 hvac
 
 feedparser
+python3-digest
