@@ -2,18 +2,54 @@ import logging
 import functools
 import asyncio
 
+import base64
+import uuid
+import python_digest
+import time
+from sn_agent.ui.settings import WebSettings
+
 import aiohttp_jinja2 as aiohttp_jinja2
 from aiohttp import web
 
 logger = logging.getLogger(__name__)
 
-def require():
+def check_auth():
     def wrapper(f):
         @asyncio.coroutine
         @functools.wraps(f)
-        def wrapped(request):
-            print(request.app)
-            return (yield from f(request))
+        def wrapped(self):
+            settings = WebSettings()
+            response = web.Response(text='')
+
+            realm = settings.AUTH_REALM
+            secret = settings.AUTH_SECRET
+            rand_str = uuid.uuid4().hex[:6].upper()
+
+            www_authenticate_header = python_digest.build_digest_challenge(time.time(), secret, realm, rand_str, False)
+
+            if 'Authorization' in self.request.headers:
+                auth_header = self.request.headers['Authorization']
+                digest_response = python_digest.parse_digest_credentials(auth_header)
+
+                # check for a valid nonce
+                if python_digest.validate_nonce(digest_response.nonce, secret) == False:
+                    response.headers['WWW-Authenticate'] = www_authenticate_header
+                    response.set_status(401, "Invalid nonce!")
+                    return response
+
+                # check validity of auth response
+                expected_request_digest = python_digest.calculate_request_digest(self.request.method, python_digest.calculate_partial_digest(settings.AUTH_USERNAME, settings.AUTH_REALM, settings.AUTH_PASSWORD), digest_response)
+                if expected_request_digest != digest_response.response:
+                    response.headers['WWW-Authenticate'] = www_authenticate_header
+                    response.set_status(401, "Incorrect credentials!")
+                    return response
+
+                # if we're authenticated, proceed with the request
+                return (yield from f(self))
+
+            response.headers['WWW-Authenticate'] = www_authenticate_header
+            response.set_status(401, "Login required!")
+            return response
         return wrapped
     return wrapper
 
@@ -25,14 +61,17 @@ def get_base_context(app):
 
 
 class IndexHandler(web.View):
-    @require()
+    @check_auth()
     async def get(self):
+
         context = get_base_context(self.request.app)
         response = aiohttp_jinja2.render_template('dashboard.jinja2', self.request, context)
+
         return response
 
 
 class ServiceHandler(web.View):
+    @check_auth()
     async def get(self):
         service_id = self.request.match_info.get('service_id')
 
